@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJR HQ | Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { adminDark: '#0f172a', adminCard: '#1e293b', adminBorder: '#334155' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-adminDark text-slate-100 font-sans antialiased max-w-md mx-auto min-h-screen border-x border-adminBorder shadow-2xl p-4 pb-12">
+
+    <!-- Dashboard Title Banner -->
+    <div class="flex items-center justify-between pb-4 mb-6 border-b border-adminBorder">
+        <div>
+            <h1 class="text-xl font-bold tracking-wide">DJR Property HQ</h1>
+            <p class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Job Matrix & Finance</p>
+        </div>
+        <div class="flex gap-2">
+            <button onclick="toggleManualForm()" class="w-10 h-10 bg-emerald-600/20 text-emerald-400 rounded-lg flex items-center justify-center border border-emerald-500/30 hover:bg-emerald-600/30 transition-colors" title="Log Past/Manual Booking">
+                <i class="fa-solid fa-plus text-sm"></i>
+            </button>
+            <button onclick="loadJobs()" class="w-10 h-10 bg-slate-800 rounded-lg flex items-center justify-center text-slate-300 border border-adminBorder hover:bg-slate-700 transition-colors">
+                <i class="fa-solid fa-rotate text-sm"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden Manual Log Form with Cost Field -->
+    <div id="manualFormContainer" class="hidden bg-slate-900 border border-emerald-500/30 rounded-xl p-4 mb-6 space-y-4 shadow-xl">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-emerald-400"><i class="fa-solid fa-file-invoice-dollar mr-1"></i> Log Booking & Cost</h3>
+            <button onclick="toggleManualForm()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        
+        <form id="manualJobForm" class="space-y-3 text-sm">
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Customer Name</label>
+                    <input type="text" id="mName" required class="w-full bg-adminCard border border-adminBorder rounded p-2 text-white text-xs focus:outline-none" placeholder="David Smith">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Job Cost (£)</label>
+                    <input type="number" id="mCost" required min="0" class="w-full bg-adminCard border border-emerald-500/40 rounded p-2 text-emerald-400 font-bold text-xs focus:outline-none" placeholder="e.g. 180">
+                </div>
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Phone Number</label>
+                <input type="tel" id="mPhone" required class="w-full bg-adminCard border border-adminBorder rounded p-2 text-white text-xs focus:outline-none" placeholder="e.g. 07123456789">
+            </div>
+            <div>
+                <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Site Address</label>
+                <input type="text" id="mAddress" required class="w-full bg-adminCard border border-adminBorder rounded p-2 text-white text-xs focus:outline-none" placeholder="e.g. 12 High Street">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Service Type</label>
+                    <select id="mService" required class="w-full bg-adminCard border border-adminBorder rounded p-2 text-white text-xs focus:outline-none">
+                        <option value="Roof Cleaning">Roof Cleaning</option>
+                        <option value="Gutter Care">Gutter Care</option>
+                        <option value="Power Washing">Power Washing</option>
+                        <option value="External Painting">External Painting</option>
+                        <option value="Garden Maintenance">Garden Care</option>
+                        <option value="Handyman Job">Handyman Job</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-400 uppercase mb-1">Job Date</label>
+                    <input type="date" id="mDate" required class="w-full bg-adminCard border border-adminBorder rounded p-2 text-white text-xs focus:outline-none">
+                </div>
+            </div>
+            <button type="submit" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-xs font-bold uppercase text-white rounded shadow transition-all">
+                Inject Job to System
+            </button>
+        </form>
+    </div>
+
+    <!-- Enhanced Financial Metrics Stats Grid -->
+    <div class="grid grid-cols-3 gap-2 mb-6">
+        <div class="bg-adminCard border border-adminBorder p-3 rounded-xl text-center">
+            <span class="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Pipeline</span>
+            <span id="activeCount" class="text-xl font-extrabold text-white">0</span>
+        </div>
+        <div class="bg-adminCard border border-adminBorder p-3 rounded-xl text-center">
+            <span class="text-[10px] text-slate-400 uppercase tracking-wider block mb-0.5">Cleared</span>
+            <span id="completedCount" class="text-xl font-extrabold text-slate-400">0</span>
+        </div>
+        <!-- New Financial Total Display -->
+        <div class="bg-adminCard border border-emerald-500/20 p-3 rounded-xl text-center bg-gradient-to-b from-adminCard to-emerald-950/20">
+            <span class="text-[10px] text-emerald-400 uppercase tracking-wider font-bold block mb-0.5">Revenue</span>
+            <span id="revenueTotal" class="text-xl font-extrabold text-emerald-400">£0</span>
+        </div>
+    </div>
+
+    <!-- Manifest Output Feed Header -->
+    <h2 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3"><i class="fa-regular fa-calendar text-xs mr-1"></i> Upcoming Manifest</h2>
+    
+    <!-- Dynamic Job Feed Container -->
+    <div id="jobList" class="space-y-4"></div>
+
+    <script>
+        function toggleManualForm() {
+            const formBox = document.getElementById('manualFormContainer');
+            formBox.classList.toggle('hidden');
+        }
+
+        document.getElementById('manualJobForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const backloggedJob = {
+                id: 'DJR-MAN-' + Math.floor(Math.random() * 9000 + 1000),
+                service: document.getElementById('mService').value,
+                date: document.getElementById('mDate').value,
+                name: document.getElementById('mName').value,
+                phone: document.getElementById('mPhone').value,
+                address: document.getElementById('mAddress').value,
+                cost: parseFloat(document.getElementById('mCost').value) || 0, // Saves cost
+                status: 'Pending'
+            };
+
+            let database = JSON.parse(localStorage.getItem('djr_bookings')) || [];
+            database.push(backloggedJob);
+            localStorage.setItem('djr_bookings', JSON.stringify(database));
+
+            this.reset();
+            toggleManualForm();
+            loadJobs();
+        });
+
+        function loadJobs() {
+            const jobs = JSON.parse(localStorage.getItem('djr_bookings')) || [];
+            const listContainer = document.getElementById('jobList');
+            
+            jobs.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            const activeJobs = jobs.filter(j => j.status === 'Pending');
+            const completedJobs = jobs.filter(j => j.status === 'Completed');
+            
+            // Calculate total earnings from completed tasks
+            const totalRevenue = completedJobs.reduce((sum, job) => sum + (parseFloat(job.cost) || 0), 0);
+            
+            document.getElementById('activeCount').innerText = activeJobs.length;
+            document.getElementById('completedCount').innerText = completedJobs.length;
+            document.getElementById('revenueTotal').innerText = '£' + totalRevenue.toLocaleString();
+
+            if(activeJobs.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-12 border border-dashed border-adminBorder rounded-xl text-slate-500 text-sm">
+                        <i class="fa-solid fa-circle-check text-2xl mb-2 text-slate-600 block"></i> No outstanding jobs left today!
+                    </div>`;
+                return;
+            }
+
+            listContainer.innerHTML = '';
+            
+            activeJobs.forEach(job => {
+                const card = document.createElement('div');
+                card.className = "bg-adminCard border border-adminBorder rounded-xl p-4 space-y-3 shadow-md";
+                
+                // Formats display price smoothly
+                const displayPrice = job.cost ? '£' + job.cost : '£0';
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-wide">${job.service}</span>
+                            <h3 class="text-sm font-semibold text-white mt-2"><i class="fa-solid fa-user mr-1.5 text-xs text-slate-400"></i>${job.name}</h3>
+                        </div>
+                        <!-- Displaying Cost Badge -->
+                        <div class="text-right">
+                            <span class="text-xs font-mono font-bold text-slate-500 block mb-1">${job.id}</span>
+                            <span class="text-xs font-bold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">${displayPrice}</span>
+                        </div>
+                    </div>
+                    <div class="text-xs text-slate-300 space-y-1 bg-black/20 p-2.5 rounded-lg border border-slate-700/50">
+                        <p><i class="fa-regular fa-calendar-days mr-2 text-slate-400"></i>Date: <strong class="text-white">${job.date}</strong></p>
+                        <p><i class="fa-solid fa-location-dot mr-2 text-slate-400"></i>Site: <strong class="text-white">${job.address}</strong></p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 pt-1">
+                        <a href="tel:${job.phone}" class="bg-slate-700/60 hover:bg-slate-700 text-xs font-bold uppercase tracking-wider text-center py-2.5 rounded-lg flex items-center justify-center gap-1.5 border border-slate-600 transition-colors">
+                            <i class="fa-solid fa-phone text-[10px]"></i> Call Client
+                        </a>
+                        <button onclick="completeJob('${job.id}')" class="bg-emerald-600 hover:bg-emerald-500 text-xs font-bold uppercase tracking-wider text-center py-2.5 rounded-lg text-white shadow-md transition-colors">
+                            Done <i class="fa-solid fa-check ml-0.5 text-[10px]"></i>
+                        </button>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
+
+        function completeJob(id) {
+            let jobs = JSON.parse(localStorage.getItem('djr_bookings')) || [];
+            jobs = jobs.map(j => j.id === id ? {...j, status: 'Completed'} : j);
+            localStorage.setItem('djr_bookings', JSON.stringify(jobs));
+            loadJobs();
+        }
+
+        window.onload = loadJobs;
+    </script>
+</body>
+</html>
