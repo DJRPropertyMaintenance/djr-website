@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book DJR Property Maintenance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { brandDark: '#0a0a0a', brandCard: '#141414', brandBorder: '#222222' }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-brandDark text-gray-100 font-sans antialiased max-w-md mx-auto min-h-screen border-x border-brandBorder shadow-2xl pb-6">
+
+    <!-- Header / Branding -->
+    <div class="bg-black p-6 border-b border-brandBorder text-center flex flex-col items-center">
+        <!-- Verbatim link to your logo file -->
+        <img src="FB_IMG_1780226936123.jpg" alt="DJR Property Maintenance Logo" class="h-16 w-auto object-contain mb-2">
+        <p class="text-xs font-bold tracking-widest text-gray-400 uppercase">Instant Mobile Booking</p>
+    </div>
+
+    <!-- Booking Form Container -->
+    <div class="p-6 space-y-6">
+        <form id="bookingForm" class="space-y-5">
+            
+            <!-- Step 1: Select Service (Now with 5 options seamlessly scaled) -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-400 tracking-wider mb-2">1. Select Service</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="border border-brandBorder bg-brandCard p-3 rounded-lg text-center cursor-pointer block hover:border-gray-400 has-[:checked]:border-white has-[:checked]:bg-white/5">
+                        <input type="radio" name="service" value="Roof Cleaning" required class="hidden">
+                        <i class="fa-solid fa-house-chimney text-lg mb-1 block"></i>
+                        <span class="text-[11px] font-medium block">Roof Clean</span>
+                    </label>
+                    <label class="border border-brandBorder bg-brandCard p-3 rounded-lg text-center cursor-pointer block hover:border-gray-400 has-[:checked]:border-white has-[:checked]:bg-white/5">
+                        <input type="radio" name="service" value="Gutters" class="hidden">
+                        <i class="fa-solid fa-trowel-bricks text-lg mb-1 block"></i>
+                        <span class="text-[11px] font-medium block">Gutter Care</span>
+                    </label>
+                    <label class="border border-brandBorder bg-brandCard p-3 rounded-lg text-center cursor-pointer block hover:border-gray-400 has-[:checked]:border-white has-[:checked]:bg-white/5">
+                        <input type="radio" name="service" value="Power Washing" class="hidden">
+                        <i class="fa-solid fa-faucet-drip text-lg mb-1 block"></i>
+                        <span class="text-[11px] font-medium block">Power Wash</span>
+                    </label>
+                    <label class="border border-brandBorder bg-brandCard p-3 rounded-lg text-center cursor-pointer block hover:border-gray-400 has-[:checked]:border-white has-[:checked]:bg-white/5">
+                        <input type="radio" name="service" value="Handyman Job" class="hidden">
+                        <i class="fa-solid fa-screwdriver-wrench text-lg mb-1 block"></i>
+                        <span class="text-[11px] font-medium block">Handyman</span>
+                    </label>
+                    <!-- Newly Injected Man with a Van Service Option -->
+                    <label class="border border-brandBorder bg-brandCard p-3 rounded-lg text-center cursor-pointer block col-span-2 hover:border-gray-400 has-[:checked]:border-white has-[:checked]:bg-white/5 border-dashed border-emerald-500/30">
+                        <input type="radio" name="service" value="Man with a Van" class="hidden">
+                        <i class="fa-solid fa-truck-ramp-box text-lg mb-1 block text-emerald-400"></i>
+                        <span class="text-[11px] font-bold text-emerald-400 block uppercase tracking-wider">Man with a Van Services</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Step 2: Choose Date -->
+            <div>
+                <label class="block text-xs font-bold uppercase text-gray-400 tracking-wider mb-2">2. Preferred Date</label>
+                <input type="date" required id="bookingDate" class="w-full bg-brandCard border border-brandBorder rounded-lg p-3 text-white text-sm focus:outline-none focus:border-gray-500">
+            </div>
+
+            <!-- Step 3: Customer Info -->
+            <div class="space-y-3">
+                <label class="block text-xs font-bold uppercase text-gray-400 tracking-wider -mb-1">3. Your Contact Details</label>
+                <input type="text" placeholder="Your Name" required id="custName" class="w-full bg-brandCard border border-brandBorder rounded-lg p-3 text-white text-sm focus:outline-none focus:border-gray-500">
+                <input type="tel" placeholder="Phone Number" required id="custPhone" class="w-full bg-brandCard border border-brandBorder rounded-lg p-3 text-white text-sm focus:outline-none focus:border-gray-500">
+                <input type="text" placeholder="First line of Address" required id="custAddress" class="w-full bg-brandCard border border-brandBorder rounded-lg p-3 text-white text-sm focus:outline-none focus:border-gray-500">
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" class="w-full py-4 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-lg hover:bg-gray-200 transition-colors shadow-lg">
+                Confirm Booking Request
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('bookingDate').min = new Date().toISOString().split('T')[0];
+
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const selectedService = document.querySelector('input[name="service"]:checked').value;
+            const newBooking = {
+                id: 'DJR-' + Math.floor(Math.random() * 9000 + 1000),
+                service: selectedService,
+                date: document.getElementById('bookingDate').value,
+                name: document.getElementById('custName').value,
+                phone: document.getElementById('custPhone').value,
+                address: document.getElementById('custAddress').value,
+                cost: 0, // Your admin app can fill this out manually upon receiving!
+                status: 'Pending'
+            };
+
+            let database = JSON.parse(localStorage.getItem('djr_bookings')) || [];
+            database.push(newBooking);
+            localStorage.setItem('djr_bookings', JSON.stringify(database));
+
+            alert(`✅ Request Sent! Your Booking Reference ID is: ${newBooking.id}`);
+            this.reset();
+        });
+    </script>
+</body>
+</html>
